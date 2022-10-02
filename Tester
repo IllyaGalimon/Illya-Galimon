@@ -4,6 +4,7 @@ int main(){
     string a = "help";
     cout << "Hello world! - ";
     cout << a ;
-    cout <<"\n secret"
+    cout <<"\n secret";
+    cout << "dont say that \n";
     return 0;
 }
