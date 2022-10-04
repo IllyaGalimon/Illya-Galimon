@@ -1,0 +1,352 @@
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <ctime>
+using namespace std;
+class Armor {
+private:
+    int armor = 0;
+    string name = "";
+public:
+    Armor(string name, int armor) {
+        this->armor = armor;
+        this->name = name;
+    }
+
+    void setArmor(int armor) {
+        this->armor = armor;
+    }
+
+    int getArmor() {
+        return this->armor;
+    }
+    void setName(string name) {
+        if (name.length() < 8) {
+            this->name = name;
+        }
+    }
+
+    string getName() {
+        return this->name;
+    }
+};
+
+
+class Weapon {
+private:
+    int stamina_cost = 0;
+    string name = "";
+    int damage = 0;
+public:
+    Weapon(string name, int damage) {
+        this->damage = damage;
+        this->name = name;
+    }
+
+    void setDamage(int damage) {
+        this->damage = damage;
+    }
+
+    int getDamage() {
+        return this->damage;
+    }
+
+    void setName(string name) {
+        if (name.length() < 8) {
+            this->name = name;
+        }
+    }
+
+    string getName() {
+        return this->name;
+    }
+
+};
+
+class Person {
+protected:
+    int health = 0;
+    int healthMax = 0;
+    string name = "";
+    int energy = 0;
+    int lvl = 0;
+public:
+    Person(string name, int lvl = 1) {
+        this->name = name;
+        this->lvl = lvl;
+    }
+
+    string getName() {
+        return this->name;
+    }
+
+    void setEnergy(int energy) {
+        this->energy = energy;
+    }
+
+    int getEnergy() {
+        return this->energy;
+    }
+
+    void setHealthMax(int healthMax) {
+        this->healthMax = healthMax;
+    }
+
+    int getHealthMax() {
+        return this->healthMax;
+    }
+
+    void setHealth(int health) {
+        if (health > this->healthMax) {
+            this->health = this->healthMax;
+        }
+        else {
+            this->health = health;
+        }
+    }
+
+    int getHealth() {
+        return this->health;
+    }
+
+    int getLvl() {
+        return this->lvl;
+    }
+};
+
+class Moster : public Person {
+protected:
+    int damage = 0;
+    int armor = 0;
+    int xp_for_kill = 0;
+public:
+    Moster(string name, int lvl) : Person(name, lvl) {
+        this->damage = 10 * lvl;
+        this->armor = 3 * lvl;
+        this->xp_for_kill = 100 * lvl;
+
+        this->health = 100 * lvl;
+        this->healthMax = 100 * lvl;
+        this->energy = 20 * lvl;
+    }
+
+    int getDamage() {
+        return this->damage;
+    }
+
+    int getArmor() {
+        return this->armor;
+    }
+};
+
+class Hero : public Person {
+protected:
+    int power = 0;
+    int agility = 0;
+    int stamina = 0;
+    int sience_orb = 0;
+    Armor* armor = NULL;
+    Weapon* weapon = NULL;
+
+    int getBaseDamage() {
+        return this->power / 4;
+    }
+
+    int getBaseArmor() {
+        return this->stamina / 4;
+    }
+
+public:
+
+    Hero(string name) : Person(name, 1) {
+        this->power = 20;
+        this->agility = 20;
+        this->stamina = 20;
+
+        this->health = 250;
+        this->healthMax = 250;
+        this->energy = 70;
+    }
+
+    void setArmor(Armor* armor) {
+        this->armor = armor;
+    }
+
+    void setWeapon(Weapon* weapon) {
+        this->weapon = weapon;
+    }
+
+    int getDamageValue() {
+        int damage = this->getBaseDamage();
+
+        if (this->weapon) {
+            damage = this->weapon->getDamage() + this->getBaseDamage();
+        }
+
+        if (rand() % 100 < (this->agility / 10) * 2) {
+            damage *= 2;
+        }
+
+        return damage;
+    }
+
+    int getArmorValue() {
+        int armor = this->getBaseArmor();
+
+        if (this->armor) {
+            armor = this->armor->getArmor() + this->getBaseArmor();
+        }
+
+        return armor;
+    }
+};
+
+class Tank : public Hero {
+private:
+public:
+    Tank(string name) : Hero(name) {
+        this->stamina = this->stamina * 3;
+    }
+};
+
+class Barbarian : public Hero {
+private:
+public:
+    Barbarian(string name) : Hero(name) {
+        this->power = this->power * 3;
+    }
+};
+
+class Rogue : public Hero {
+private:
+public:
+    Rogue(string name) : Hero(name) {
+        this->agility = this->agility * 3;
+    }
+};
+
+class Engine {
+private:
+    string monsterNames[8] = { "skeleton wheel" , "Wicth" , "Berserker", "Mimic" , "Mundus" , " Straga " , "Psycho Mantis" , "Valkyries" };
+    string armorNames[5] = { "Traveler's armor","shadow armor","ice armor","Blyde","Daedric equipment" };
+    string weaponNames[5] = { "Yamato","saber","Zenit","Rapier","cursed sword" };
+
+    int getRandomNumber(int min, int max) {
+        return min + rand() % (max - min + 1);
+    }
+
+    int onePunch(int damage, int armor) {
+        if (armor - damage >= 0) {
+            return 0;
+        }
+        else {
+            return abs(armor - damage);
+        }
+    }
+
+    void showOnePunchMessage(string name, int damage, int healthPoint) {
+        cout << name << "  punch! ";
+        cout << " Damage: " << damage << " Current HP: " << healthPoint << endl;
+    }
+
+public:
+    Hero* generateHero(string name, int type = 1) {
+        Hero* hero = NULL;
+        if (type == 1) {
+            hero = new Tank(name);
+        }
+        else if (type == 2) {
+            hero = new Barbarian(name);
+        }
+        else {
+            hero = new Rogue(name);
+        }
+
+        return hero;
+    }
+
+    Moster* generateMonster(int lvl = 1) {
+        if (lvl > 1) {
+            if (rand() % 2 == 1) {
+                lvl++;
+            }
+            else {
+                lvl--;
+            }
+        }
+        else {
+            if (rand() % 2 == 1) {
+                lvl++;
+            }
+        }
+
+        return new Moster(this->monsterNames[rand() % 8], lvl);
+    }
+
+    Armor* generateArmor() {
+        return new Armor(this->armorNames[rand() % 5], this->getRandomNumber(3, 20));
+    }
+
+    Weapon* generateDamage() {
+        return new Weapon(this->weaponNames[rand() % 5], this->getRandomNumber(3, 20));
+    }
+
+    bool fightOneRound(Hero* player, Moster* monster) {
+
+        while (player->getHealth() > 0 && monster->getHealth() > 0) {
+            int damage = this->onePunch(monster->getDamage(), player->getArmorValue());
+            player->setHealth(player->getHealth() - damage);
+            this->showOnePunchMessage(monster->getName(), damage, player->getHealth());
+
+            damage = this->onePunch(player->getDamageValue(), monster->getArmor());
+            monster->setHealth(monster->getHealth() - this->onePunch(player->getDamageValue(), monster->getArmor()));
+            this->showOnePunchMessage(player->getName(), damage, monster->getHealth());
+        }
+
+        if (player->getHealth() > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+};
+int main() {
+    srand(time(0));
+    int clas_choose = 0;
+    string name_choose = "";
+
+    Engine* engine = new Engine();
+    Hero* hero = NULL;
+    cout << "Hello world \n";
+    cout << "Enter your name - ";
+    cin >> name_choose;
+    cout << "choose your favourit class:1-Tank, 2-Barbarian, 3-Robber\n";
+    cin >> clas_choose;
+    if (clas_choose == 1) {
+        cout << "Ok.You chouse Tank" << endl;
+    }
+    if (clas_choose == 2) {
+        cout << "Ok.You chouse Barbarian" << endl;
+    }
+    if (clas_choose == 3) {
+        cout << "Ok.You chouse Robber" << endl;
+    }
+
+hero = engine->generateHero(name_choose, clas_choose);
+Moster* obj = engine->generateMonster(hero->getLvl());
+hero->setArmor(engine->generateArmor());
+hero->setWeapon(engine->generateDamage());
+cout << "You Wanna Fight Bro?";
+
+    if (engine->fightOneRound(hero, obj)) {
+        cout << "Player win!";
+    }
+    else {
+        cout << "Monster win!";
+    }
+    return 0;
+};
+
+
